@@ -142,7 +142,10 @@ armbian-add-overlay unlock.dts
 
 [半世一夕](https://www.bilibili.com/read/cv20207340)  ax200
 
-ax210  005批次直接使用无需修复
+ax210  005批次
+```bash
+sudo mv /usr/lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm  /usr/lib/firmware/iwlwifi-ty-a0-gf-a0.bak
+```
 
 # 五.驱动
 
