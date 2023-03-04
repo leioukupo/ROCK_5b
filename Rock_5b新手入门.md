@@ -7,12 +7,13 @@
 tf卡、emmc、nvme任选其一
 
 ### 系统镜像文件
-![image-20230222134004479](assets\Rock_5b文档.assets\image-20230222134004479.png)
+![image-20230222134004479](assets/Rock_5b文档.assets/image-20230222134004479.png)
 #### [官方系统下载](https://github.com/radxa/debos-radxa/releases)
 
 包括ubuntu、debian、安卓
 
-**账户密码 rock rock**
+**官方系统账户密码 rock rock**
+**armbian没用自己创建密码, 默认是 root 1234**
 
 #### 自行编译armbian
 
@@ -68,11 +69,11 @@ https://forum.radxa.com/t/arch-based-rebornos-reviewed-on-rock5b/14237/5
 >   2.   使用解压软件解压镜像压缩包，解压后的文件中，以“ .img”结尾的文件就是操作系统的
 >        镜像文件
 >   3.   运行balenaEtcher，选择镜像文件和tf卡
->   ![image-20230301103141881](assets\Rock_5b新手入门.assets\image-20230301103141881.png)
+>   ![image-20230301103141881](assets/Rock_5b新手入门.assets/image-20230301103141881.png)
 
 +   使用 Win32Diskimager 烧录
 
-![image-20230301103712625](assets\Rock_5b新手入门.assets\image-20230301103712625.png)
+![image-20230301103712625](assets/Rock_5b新手入门.assets/image-20230301103712625.png)
 
 ### 2.2.NVME固态
 
@@ -80,7 +81,7 @@ https://forum.radxa.com/t/arch-based-rebornos-reviewed-on-rock5b/14237/5
 +   下载RKDevTool和rk驱动，安装rk驱动，按住mskrom按钮后上电
 +   打开RKDevTool，右键，`load config` 选择rock-5b-spinor.cfg
 
-![image-20230301105119658](assets\Rock_5b新手入门.assets\image-20230301105119658.png)
+![image-20230301105119658](assets/Rock_5b新手入门.assets/image-20230301105119658.png)
 
 +   spinor选择你下载的spi，loader选择下载的loader，点击`run`刷写spi
 
@@ -92,7 +93,7 @@ https://forum.radxa.com/t/arch-based-rebornos-reviewed-on-rock5b/14237/5
 +   下载RKDevTool和rk驱动，安装rk驱动，按住mskrom按钮后上电
 +   打开RKDevTool，右键，`load config` 选择rock-5b-emmc.cfg
 
-![image-20230301105649461](assets\Rock_5b新手入门.assets\image-20230301105649461.png)
+![image-20230301105649461](assets/Rock_5b新手入门.assets/image-20230301105649461.png)
 +   image选择你下载的系统镜像，loader选择下载的loader，点击`run`刷写系统镜像
 
 +   emmc插入5b通电开机
@@ -104,9 +105,9 @@ https://forum.radxa.com/t/arch-based-rebornos-reviewed-on-rock5b/14237/5
 # 二.跑分参考
 
 +   官方ubuntu-不知名品牌tf卡-默频2.5等奖
-    ![image-20230222182522972](assets\Rock_5b文档.assets\image-20230222182522972.png)
+    ![image-20230222182522972](assets/Rock_5b文档.assets/image-20230222182522972.png)
 
-    ![image-20230222190952314](assets\Rock_5b文档.assets\image-20230222190952314.png)
+    ![image-20230222190952314](assets/Rock_5b文档.assets/image-20230222190952314.png)
 
 ## 跑分软件
 
@@ -175,21 +176,21 @@ sudo apt update
 + 修改armbian-compile-action中的action.yml
 
     ```yaml
-    ./compile.sh \
-    BOARD=${{ inputs.board }} \
-    BRANCH=${{ inputs.branch }} \
-    RELEASE=${{ env.release }} \
-    BUILD_MINIMAL=${{ env.build-minimal }} \
-    BUILD_DESKTOP=${{ env.build-desktop }} \
-    KERNEL_ONLY=no \
-    KERNEL_CONFIGURE=no \
-    DESKTOP_ENVIRONMENT=${{ env.desktop-environment }} \
-    DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.desktop-environment-config-name }} \
-    DESKTOP_APPGROUPS_SELECTED=${{ env.desktop_appgroups_selected }} \
-    EXPERT=${{ env.expert }} \
-    BOARD_FIRMWARE_INSTALL="-full" \
-    SHARE_LOG=no \
-    DEBUG=yes \
+    ./compile.sh /
+    BOARD=${{ inputs.board }} /
+    BRANCH=${{ inputs.branch }} /
+    RELEASE=${{ env.release }} /
+    BUILD_MINIMAL=${{ env.build-minimal }} /
+    BUILD_DESKTOP=${{ env.build-desktop }} /
+    KERNEL_ONLY=no /
+    KERNEL_CONFIGURE=no /
+    DESKTOP_ENVIRONMENT=${{ env.desktop-environment }} /
+    DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ env.desktop-environment-config-name }} /
+    DESKTOP_APPGROUPS_SELECTED=${{ env.desktop_appgroups_selected }} /
+    EXPERT=${{ env.expert }} /
+    BOARD_FIRMWARE_INSTALL="-full" /
+    SHARE_LOG=no /
+    DEBUG=yes /
     COMPRESS_OUTPUTIMAGE=sha,gpg,xz
     # 修改相应参数
     touch .ignore_changes
@@ -263,6 +264,6 @@ sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
 ## USB电流限制
 
-![0FB2B73D-8864-44F6-A3BA-B2C1FDD5886E](assets\Rock_5b新手入门.assets\0FB2B73D-8864-44F6-A3BA-B2C1FDD5886E.jpg)
+![0FB2B73D-8864-44F6-A3BA-B2C1FDD5886E](assets/Rock_5b新手入门.assets/0FB2B73D-8864-44F6-A3BA-B2C1FDD5886E.jpg)
 
 **怕电流太大可以拿铅笔涂一涂测一测，电流小就多涂点，电流大就橡皮擦一擦**
