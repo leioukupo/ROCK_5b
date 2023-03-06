@@ -24,8 +24,10 @@ tf卡、emmc、nvme任选其一
 #### [整合包系统下载](https://github.com/amazingfate/armbian-rock5b-images/releases)@[amazingfate](https://github.com/amazingfate)
 
 #### [Openwrt](https://pan.baidu.com/s/1GvFl6QH0loFjlHhsWrPBtQ?pwd=u7ae)
+[阿里云盘链接](https://www.aliyundrive.com/s/sNDgnCepcyy)
 
 #### [Uos](https://pan.baidu.com/s/1beBSJEWxgWKDRN8aDCr1BQ?pwd=j7hn)
+[阿里云盘链接](https://www.aliyundrive.com/s/UsBL7cdfe5c)
 
 #### 基于Arch的RebornOs
 
