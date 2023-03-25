@@ -23,10 +23,10 @@ tf卡、emmc、nvme任选其一
 
 #### [整合包系统下载](https://github.com/amazingfate/armbian-rock5b-images/releases)@[amazingfate](https://github.com/amazingfate)
 
-#### [Openwrt](https://pan.baidu.com/s/1GvFl6QH0loFjlHhsWrPBtQ?pwd=u7ae)
+#### [Openwrt]
 [阿里云盘链接](https://www.aliyundrive.com/s/sNDgnCepcyy)
 
-#### [Uos](https://pan.baidu.com/s/1beBSJEWxgWKDRN8aDCr1BQ?pwd=j7hn)
+#### [Uos]
 [阿里云盘链接](https://www.aliyundrive.com/s/UsBL7cdfe5c)
 
 #### 基于Arch的RebornOs
@@ -162,7 +162,10 @@ sudo mv /usr/lib/firmware/iwlwifi-ty-a0-gf-a0.pnvm  /usr/lib/firmware/iwlwifi-ty
 sudo add-apt-repository ppa:liujianfeng1994/panfork-mesa
 sudo apt update
 ```
-
+**中科大ppa反代加速**
+```bash
+sudo find /etc/apt/sources.list.d/ -type f -name "*.list" -exec  sed  -i.bak -r  's#deb(-src)?\s*http(s)?://ppa.launchpad.net#deb\1 http\2://launchpad.proxy.ustclug.org#ig' {} \;
+```
 + # 多媒体娱乐
 
 >   包括 **chromium110** 、**ffmpeg4.4** 、**gstreamer** 、**kodi19.4** 、**moonlight** 、**obs28** 等
