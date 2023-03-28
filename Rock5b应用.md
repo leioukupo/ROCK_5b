@@ -1,8 +1,7 @@
 # 一. 安卓容器
 
 1. 下载我开启了安卓容器选项的内核进行安装或者下载我最新编译的系统不需要更新内核
-[内核deb包](https://github.com/3026187875/armbian-rock5b-images/releases/download/20230309-1402/linux-image-legacy-rockchip-rk3588_5.10.110-Sbf8b-D3196-Pd578-Ccb0cHfe66-Bb436_arm64.deb)
-
+[内核deb包](https://github.com/3026187875/armbian-rock5b-images/releases/download/20230309-1402/linux-image-legacy-rockchip-rk3588_5.10.110-Sbf8b-D3196-Pd578-Ccb0cHfe66-Bb436_arm64.deb)@微信非虫
 2. 安装ppa源里的malig610固件
 ```bash
 sudo apt install mali-g610-firmware
