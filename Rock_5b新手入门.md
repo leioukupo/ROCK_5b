@@ -169,6 +169,12 @@ sudo find /etc/apt/sources.list.d/ -type f -name "*.list" -exec  sed  -i.bak -r 
 + # 多媒体娱乐
 
 >   包括 **chromium110** 、**ffmpeg4.4** 、**gstreamer** 、**kodi19.4** 、**moonlight** 、**obs28** 等
++ 微信  
+```bash
+sudo add-apt-repository ppa:liujianfeng1994/wechat
+sudo apt update
+sudo apt install wechat-uos
+```
 
 ```bash
 sudo add-apt-repository ppa:liujianfeng1994/rockchip-multimedia
