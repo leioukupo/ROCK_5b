@@ -26,11 +26,12 @@ tf卡、emmc、nvme任选其一
 #### [Openwrt]
 [阿里云盘链接](https://www.aliyundrive.com/s/sNDgnCepcyy)
 
-#### [Uos]
+#### [Uos]@微信张鹏
 [阿里云盘链接](https://www.aliyundrive.com/s/UsBL7cdfe5c)
 > 用户名密码：
 >    root
 >    123456
+> https://zphj1987.com/docs/rk3588/%E8%BF%9B%E9%98%B6%E7%AF%87/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9B%B8%E5%85%B3/rock5b%E5%8F%AF%E4%BB%A5%E8%BF%90%E8%A1%8C%E7%9A%84UOS%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html
 #### 基于Arch的RebornOs
 
 https://github.com/RebornOS-Developers/lxqt-rock5b-image
