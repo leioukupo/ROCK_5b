@@ -28,7 +28,9 @@ tf卡、emmc、nvme任选其一
 
 #### [Uos]
 [阿里云盘链接](https://www.aliyundrive.com/s/UsBL7cdfe5c)
-
+> 用户名密码：
+>    root
+>    123456
 #### 基于Arch的RebornOs
 
 https://github.com/RebornOS-Developers/lxqt-rock5b-image
