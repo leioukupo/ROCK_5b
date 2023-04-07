@@ -229,5 +229,276 @@ cd ./install/rknn_yolov5_demo_Linux
         # 设置NPU 频率，例如，设置1GHz
         echo 1000000000 > /sys/kernel/debug/clk/clk_npu_dsu0/clk_rate
         ```
+# 四.部署自己的模型到板子上 
+> **建议先用python部署，跑通流程后再用c++**
+> 我使用的是自己训练的烟支识别模型，单类别输出
+> **yolov5** **v7**版本
+## 4.1 pt转onnx
+```python
+python export.py --weights xxxx.pt --include onnx
+```
+## 4.2使用netron查看转化后的模型输入和输出
+```bash
+https://github.com/lutzroeder/netron
+# 提供win和linux的包
+```
+我的模型输入是1x3x640x640,输出是1x25200x6
+实际验证输入为1x640x640x3也可以
+## 4.3使用模拟器验证
+> 删除推理后对outputs进行处理的所有部分，需要自己写结果处理
+> yolov5输出的结果1x25200x6
+> 25200是特征数量   6是 x1 y1 x2 y2 类别置信度 类别
+> 处理思路是找出6中的置信度最大的那一个，在图上框出来
+```python
+def smoke_prosess(test):
+    max_index = np.argmax(test[:, :, 4])
+    return test[:, max_index]
+def xywh2xyxy(x):
+    # Convert [x, y, w, h] to [x1, y1, x2, y2]
+    y = np.copy(x)
+    y[:, 0] = x[:, 0] - x[:, 2] / 2  # top left x
+    y[:, 1] = x[:, 1] - x[:, 3] / 2  # top left y
+    y[:, 2] = x[:, 0] + x[:, 2] / 2  # bottom right x
+    y[:, 3] = x[:, 1] + x[:, 3] / 2  # bottom right y
+    return y
+boxes = smoke_prosess(outputs[0])
+boxes = xywh2xyxy(boxes)
+top = int(boxes[:,0])
+left = int(boxes[:, 1])
+right = int(boxes[:, 2])
+bottom = int(boxes[:, 3])
+cv2.rectangle(img, (top, left), (right, bottom), (255, 0, 0), 2)
+```
+！！！！如果你在模拟器上得到的置信度都是0，关闭量化。我关闭量化后就不全是0了。猜测原因是量化数据只有一张不够，官方推荐20张左右
+```python
+ret = rknn.build(do_quantization=False, dataset=DATASET)
+```
+！！！！opencv默认通道是BGR，要转成RGB
+smoke.py
+```python
+import os
+import urllib
+import traceback
+import time
+import sys
+import numpy as np
+import cv2
+from rknn.api import RKNN
 
-        
+ONNX_MODEL = 'smoke.onnx'
+RKNN_MODEL = 'smoke.rknn'
+IMG_PATH = './2.jpg'
+DATASET = './smoke.txt'
+OBJ_THRESH = 0.25
+NMS_THRESH = 0.45
+IMG_SIZE = 640
+CLASSES = ("smoke")
+
+
+def xywh2xyxy(x):
+    # Convert [x, y, w, h] to [x1, y1, x2, y2]
+    y = np.copy(x)
+    y[:, 0] = x[:, 0] - x[:, 2] / 2  # top left x
+    y[:, 1] = x[:, 1] - x[:, 3] / 2  # top left y
+    y[:, 2] = x[:, 0] + x[:, 2] / 2  # bottom right x
+    y[:, 3] = x[:, 1] + x[:, 3] / 2  # bottom right y
+    return y
+
+
+def smoke_prosess(test):
+    max_index = np.argmax(test[:, :, 4])
+    # print(test[:,max_index])
+    return test[:, max_index]
+
+
+if __name__ == '__main__':
+    # Create RKNN object
+    rknn = RKNN(verbose=True)
+
+    # pre-process config
+    print('--> Config model')
+    rknn.config(mean_values=[[0, 0, 0]], std_values=[
+                [255, 255, 255]], target_platform='rk3588')
+    print('done')
+
+    # Load ONNX model
+    print('--> Loading model')
+    ret = rknn.load_onnx(model=ONNX_MODEL)
+    if ret != 0:
+        print('Load model failed!')
+        exit(ret)
+    print('done')
+
+    # Build model
+    print('--> Building model')
+    ret = rknn.build(do_quantization=False, dataset=DATASET)
+    if ret != 0:
+        print('Build model failed!')
+        exit(ret)
+    print('done')
+
+    # Export RKNN model
+    print('--> Export rknn model')
+    ret = rknn.export_rknn(RKNN_MODEL)
+    if ret != 0:
+        print('Export rknn model failed!')
+        exit(ret)
+    print('done')
+
+    # Init runtime environment
+    print('--> Init runtime environment')
+    ret = rknn.init_runtime()
+    # ret = rknn.init_runtime('rk3566')
+    if ret != 0:
+        print('Init runtime environment failed!')
+        exit(ret)
+    print('done')
+
+    # Set inputs
+    img = cv2.imread(IMG_PATH)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # opencv默认是bgr
+    img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
+    print(img.shape)
+
+    # Inference
+    print('--> Running model')
+    outputs = rknn.inference(inputs=[img])
+    np.save('./test_0.npy', outputs[0])
+    print('done')
+    # 处理结果
+    boxes = smoke_prosess(outputs[0])
+    boxes = xywh2xyxy(boxes)
+    top = int(boxes[:, 0])
+    left = int(boxes[:, 1])
+    right = int(boxes[:, 2])
+    bottom = int(boxes[:, 3])
+    cv2.rectangle(img, (top, left), (right, bottom), (255, 0, 0), 2)
+    # show output
+    cv2.imshow("result", img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    rknn.release()
+```
+成功运行后会显示一个窗口，用红框标出烟支
+## 4.4 部署到板端
++ 复制rknnapi.so到系统库路径
+```bash
+sudo cp ./librknn_api.so /usr/lib
+sudo cp ./librknnrt.so /usr/lib
+# so文件在rknpu2/runtime/RK3588/Linux/librknn_api/aarch64/librknnrt.so
+pip install ./rknn_toolkit_lite2-1.4.0-cp39-cp39-linux_aarch64.whl
+# whl文件在rknn-toolkit2/rknn_toolkit_lite2/packages/rknn_toolkit_lite2-1.4.0-cp39-cp39-linux_aarch64.whl
+```
+进入/rknn-toolkit2/rknn_toolkit_lite2/examples目录
+```python
+python3 test.py
+# 测试环境是否正常
+```
+> 模拟器不需要对齐输入，板端必须对齐模型输入
+somke_board.py
+```python
+import cv2
+import numpy as np
+import platform
+from rknnlite.api import RKNNLite
+
+# decice tree for rk356x/rk3588
+DEVICE_COMPATIBLE_NODE = '/proc/device-tree/compatible'
+
+def get_host():
+    # get platform and device type
+    system = platform.system()
+    machine = platform.machine()
+    os_machine = system + '-' + machine
+    if os_machine == 'Linux-aarch64':
+        try:
+            with open(DEVICE_COMPATIBLE_NODE) as f:
+                device_compatible_str = f.read()
+                if 'rk3588' in device_compatible_str:
+                    host = 'RK3588'
+                else:
+                    host = 'RK356x'
+        except IOError:
+            print('Read device node {} failed.'.format(DEVICE_COMPATIBLE_NODE))
+            exit(-1)
+    else:
+        host = os_machine
+    return host
+
+RK356X_RKNN_MODEL = 'resnet18_for_rk356x.rknn'
+RK3588_RKNN_MODEL = '/home/leioukupo/npu/rknn-toolkit2/rknn_toolkit_lite2/smoke.rknn'
+
+def smoke_prosess(test):
+    max_index = np.argmax(test[:, :, 4])
+    # print(test[:,max_index])
+    return test[:, max_index]
+
+
+def xywh2xyxy(x):
+    # Convert [x, y, w, h] to [x1, y1, x2, y2]
+    y = np.copy(x)
+    y[:, 0] = x[:, 0] - x[:, 2] / 2  # top left x
+    y[:, 1] = x[:, 1] - x[:, 3] / 2  # top left y
+    y[:, 2] = x[:, 0] + x[:, 2] / 2  # bottom right x
+    y[:, 3] = x[:, 1] + x[:, 3] / 2  # bottom right y
+    return y
+if __name__ == '__main__':
+
+    host_name = get_host()
+    if host_name == 'RK356x':
+        rknn_model = RK356X_RKNN_MODEL
+    elif host_name == 'RK3588':
+        rknn_model = RK3588_RKNN_MODEL
+    else:
+        print("This demo cannot run on the current platform: {}".format(host_name))
+        exit(-1)
+
+    rknn_lite = RKNNLite()
+
+    # load RKNN model
+    print('--> Load RKNN model')
+    ret = rknn_lite.load_rknn(rknn_model)
+    if ret != 0:
+        print('Load RKNN model failed')
+        exit(ret)
+    print('done')
+
+    ori_img = cv2.imread('./2.jpg')
+    img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
+
+    # init runtime environment
+    print('--> Init runtime environment')
+    # run on RK356x/RK3588 with Debian OS, do not need specify target.
+    if host_name == 'RK3588':
+        ret = rknn_lite.init_runtime(core_mask=RKNNLite.NPU_CORE_0)
+    else:
+        ret = rknn_lite.init_runtime()
+    if ret != 0:
+        print('Init runtime environment failed')
+        exit(ret)
+    print('done')
+
+    # Inference
+    print('--> Running model')
+    img=cv2.resize(img,[640,640]) # 必须对齐模型输入
+    outputs = rknn_lite.inference(inputs=img)
+    print(outputs)
+    boxes = smoke_prosess(outputs[0])
+    boxes = xywh2xyxy(boxes)
+    top = int(boxes[:,0])
+    left = int(boxes[:, 1])
+    right = int(boxes[:, 2])
+    bottom = int(boxes[:, 3])
+    cv2.rectangle(img, (top, left), (right, bottom), (255, 0, 0), 2)
+    # show output
+    # 正式应用时需要还原成原本的大小
+    cv2.imshow("result", img)
+    cv2.waitKey(1000)
+    cv2.destroyAllWindows()
+    print('done')
+
+    rknn_lite.release()
+
+```
+全流程跑通了，后续根据自己的需求调试精度
+视频流和图片一样
