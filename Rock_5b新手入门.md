@@ -16,7 +16,10 @@ tf卡、emmc、nvme任选其一
 **armbian没用自己创建密码, 默认是 root 1234**
 
 #### 自行编译armbian
-
+> 指定国内源
+> ```bash
+> DOCKER_ARMBIAN_BASE_COORDINATE_PREFIX=ghcr.dockerproxy.com/armbian/docker-armbian-build:armbian- DOWNLOAD_MIRROR=china GHCR_MIRROR=dockerproxy GITHUB_MIRROR=ghproxy
+> ```
 >   注意boot要改成fat格式
 >
 >   BOOTFS_TYPE="fat"
